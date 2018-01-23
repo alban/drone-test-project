@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-expected_output="Hello to drone"
+expected_output="Hello world"
 output="$(./bin/hello)"
 
 if [[ "${output}" != "${expected_output}" ]]; then
