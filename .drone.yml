@@ -9,17 +9,16 @@ pipeline:
     image: albanc/drone-plugin-kube-spawn
     addr: "localhost:50051"
     setup: up
-    volumes:
-      - /var/lib/kube-spawn:/var/lib/kube-spawn
   get-kubectl:
     group: k8s-setup
     image: busybox
     commands:
       - sh -c 'wget https://storage.googleapis.com/kubernetes-release/release/v1.9.2/bin/linux/amd64/kubectl -O kubectl && chmod 0755 kubectl'
   test-k8s-cluster:
-    image: busybox
+    image: ubuntu
     commands:
+      - sh -c 'set -ex; while true; do notready=$(./kubectl --kubeconfig ./kubeconfig get nodes | grep NotReady || true); if [ -n "$notready" ] ; then echo "not ready yet"; sleep 3; else ./kubectl --kubeconfig ./kubeconfig get nodes; break; fi; done'
       - sh -c './kubectl --kubeconfig ./kubeconfig get nodes'
-      - sh -c './kubectl --kubeconfig ./kubeconfig run nginx --image=nginx --replicas=3'
-      - sh -c './kubectl --kubeconfig ./kubeconfig get deployment nginx'
-      - sh -c 'set -ex; while true; do available=$(./kubectl --kubeconfig ./kubeconfig get deployment nginx -o jsonpath="{.status.availableReplicas}" || true); if [ -z $available ] || [ $available -lt 3 ]; then echo "not ready yet"; sleep 3; else ./kubectl --kubeconfig ./kubeconfig get deployments; break; fi; done'
+      - sh -c './kubectl --kubeconfig ./kubeconfig apply -f "https://cloud.weave.works/k8s/scope.yaml"'
+      - sh -c './kubectl --kubeconfig ./kubeconfig get pods'
+      - sh -c 'for i in $(seq 1 5) ; do sleep 3 ; ./kubectl --kubeconfig ./kubeconfig get pods ; done'
