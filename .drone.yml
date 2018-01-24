@@ -6,7 +6,7 @@ pipeline:
   start-k8s-cluster:
     group: k8s-setup
     network_mode: host
-    image: schu/drone-plugin-kube-spawn
+    image: albanc/drone-plugin-kube-spawn
     addr: "localhost:50051"
     setup: up
   get-kubectl:
@@ -23,7 +23,7 @@ pipeline:
       - sh -c 'set -ex; while true; do available=$(./kubectl --kubeconfig ./kubeconfig get deployment nginx -o jsonpath="{.status.availableReplicas}" || true); if [ -z $available ] || [ $available -lt 3 ]; then echo "not ready yet"; sleep 3; else ./kubectl --kubeconfig ./kubeconfig get deployments; break; fi; done'
   stop-k8s-cluster:
     network_mode: host
-    image: schu/drone-plugin-kube-spawn
+    image: albanc/drone-plugin-kube-spawn
     addr: "localhost:50051"
     setup: destroy
     when:
