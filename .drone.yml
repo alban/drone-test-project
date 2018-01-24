@@ -11,8 +11,8 @@ pipeline:
     setup: up
     volumes:
       - type: bind
-        source: /var/lib/kube-spawn
-        target: /var/lib/kube-spawn
+        source: "/var/lib/kube-spawn"
+        target: "/var/lib/kube-spawn"
   get-kubectl:
     group: k8s-setup
     image: busybox
